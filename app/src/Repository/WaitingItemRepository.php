@@ -20,4 +20,30 @@ class WaitingItemRepository extends \Doctrine\ORM\EntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function findByBookId(int $bookId): ?WaitingItem
+    {
+        return $this->findOneBy(['bookId' => $bookId]);
+    }
+
+    public function findByUserId(int $bookId): ?WaitingItem
+    {
+        return $this->findOneBy(['bookId' => $bookId]);
+    }
+
+    public function getNextByBookId( int $bookId): ?WaitingItem
+    {
+        return $this->findOneBy(['bookId' => $bookId], ['dateCreated' => 'desc']);
+    }
+
+    public function delete(WaitingItem $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+
 }

@@ -21,7 +21,32 @@ class UserBookRepository extends \Doctrine\ORM\EntityRepository
         }
     }
 
-    public function create(){
+    public function findById(int $id): ?UserBook
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
 
+    public function findByBookId(int $bookId): ?UserBook
+    {
+        return $this->findOneBy(['bookId' => $bookId]);
+    }
+
+    public function delete(UserBook $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function findOneByToken($value): ?UserBook
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.token = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
     }
 }

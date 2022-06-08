@@ -30,4 +30,14 @@ class UserIdentityRepository extends \Doctrine\ORM\EntityRepository
             ->getOneOrNullResult()
             ;
     }
+
+    public function findOneByToken($value): ?UserIdentity
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.token = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }

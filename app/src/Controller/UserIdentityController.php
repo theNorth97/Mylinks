@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserIdentity;
 use App\Repository\UserRepository;
 use App\Repository\UserIdentityRepository;
+use Doctrine\DBAL\Connection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Uuid;
@@ -14,11 +15,16 @@ class UserIdentityController
 {
     private UserRepository $userRepository;
     private UserIdentityRepository $userIdentityRepository;
+    private Connection $connection;
 
-    public function __construct(UserRepository $userRepository, UserIdentityRepository $userIdentityRepository)
-    {
+    public function __construct(
+        UserIdentityRepository $userIdentityRepository,
+        UserRepository $userRepository,
+        Connection $connection
+    ) {
         $this->userRepository = $userRepository;
         $this->userIdentityRepository = $userIdentityRepository;
+        $this->connection = $connection;
     }
 
     public function signUp(ServerRequestInterface $request, ResponseInterface $response, array $args)
@@ -40,13 +46,23 @@ class UserIdentityController
         $password = password_hash($password, PASSWORD_DEFAULT);
 
         $user = new User($name, $phone);
-        $this->userRepository->add($user, true);
+        $this->connection->beginTransaction();
+        try {
+            $this->userRepository->add($user, true);
+            $user = $this->userRepository->findOneByNameField($name);
+            $token = Uuid::uuid1()->toString();
 
-        $user = $this->userRepository->findOneByNameField($name);
-        $token = Uuid::uuid1()->toString();
+            $userIdentity = new UserIdentity($user->getId(), $user->getPhone(), $password, $token);
+            $this->userIdentityRepository->add($userIdentity, true);
+        } catch (\Exception $exception) {
+            $this->connection->rollBack();
 
-        $userIdentity = new UserIdentity($user->getId(), $user->getPhone(), $password, $token);
-        $this->userIdentityRepository->add($userIdentity, true);
+            $error = "error";
+            $errorMessage = json_encode($error);
+            $response->getBody()->write($errorMessage);
+            return $response->withStatus(422);
+        }
+        $this->connection->commit();
 
         return $response
             ->withStatus(201)
@@ -77,7 +93,6 @@ class UserIdentityController
         if(empty($params['password'])) {
             $messages['password'] = 'Password not be empty';
         }
-
         return $messages;
     }
 

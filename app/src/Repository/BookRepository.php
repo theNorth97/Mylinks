@@ -40,7 +40,7 @@ class BookRepository extends \Doctrine\ORM\EntityRepository
         }
     }
 
-    public function deleteById($id)
+    public function deleteById(int $id)
     {
         return $this->createQueryBuilder('b')
             ->delete('books', 'b')

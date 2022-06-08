@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping\Table;
 final class User
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
-    private int $id;
+    private ?int $id;
 
     #[Column(type: 'string', unique: true, nullable: false)]
     private string $name;
@@ -21,8 +21,9 @@ final class User
     #[Column(type: 'string', unique: true,  nullable: false)]
     private string $phone;
 
-    public function __construct(string $name, string $phone)
+    public function __construct(string $name, string $phone, int $id=null)
     {
+        $this->id=$id;
         $this->name = $name;
         $this->phone = $phone;
     }

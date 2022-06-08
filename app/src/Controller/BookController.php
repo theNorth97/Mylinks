@@ -133,7 +133,7 @@ class BookController
                 return $response->withStatus(201);
             }
         } else {
-            $error['id'] = "user with this id not found";
+            $error['id'] = "book with this id not found";
             $errorMessage = json_encode($error);
             $response->getBody()->write($errorMessage);
 
@@ -143,21 +143,17 @@ class BookController
 
     public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $this->bookRepository->deleteById($args['id']);
+        $book = $this->bookRepository->findById($args['id']);
+        if($book instanceof Book) {
+            $this->bookRepository->delete($book, true);
 
-        return $response->withStatus(200);
-
-//        $book = $this->bookRepository->findById($args['id']);
-//        if($book instanceof Book) {
-//            $this->bookRepository->delete($book, true);
-//
-//            return $response->withStatus(200);
-//        } else {
-//            $error['id'] = "user with this id not found";
-//            $errorMessage = json_encode($error);
-//            $response->getBody()->write($errorMessage);
-//            return $response->withStatus(422);
-//        }
+            return $response->withStatus(200);
+        } else {
+            $error['id'] = "book with this id not found";
+            $errorMessage = json_encode($error);
+            $response->getBody()->write($errorMessage);
+            return $response->withStatus(422);
+        }
     }
 }
 

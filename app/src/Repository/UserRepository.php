@@ -30,6 +30,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
             ->getOneOrNullResult()
         ;
     }
+
     public function findByName(string $name): ?User
     {
         return $this->findOneBy(['name' => $name]);
