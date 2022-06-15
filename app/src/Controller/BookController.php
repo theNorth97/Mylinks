@@ -127,11 +127,8 @@ class BookController
             if ($book->getDate() !== $date) {
                 $book->setDate($date);
             }
-            if ($book->setTitle($title) === $book->setTitle($title)|| $book->setAuthor($author) == $book->setAuthor($author) || $book->setDate($date) === $book->setDate($date)) {
-                $this->bookRepository->add($book, true);
-
-                return $response->withStatus(201);
-            }
+            $this->bookRepository->add($book, true);
+            return $response->withStatus(201);
         } else {
             $error['id'] = "book with this id not found";
             $errorMessage = json_encode($error);
