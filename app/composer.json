@@ -1,11 +1,9 @@
 {
     "require": {
         "slim/slim": "4.*",
-        "slim/psr7": "^1.5",
-        "doctrine/orm": "^2.12",
-        "symfony/cache": "^6.1",
-        "uma/dic": "^3.0",
-        "ramsey/uuid": "^4.3"
+        "slim/psr7": "^1.6",
+        "twig/twig": "^3.5",
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-4": {
